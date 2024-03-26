@@ -1,44 +1,136 @@
+from datetime import datetime, timedelta
 from abc import ABC, abstractmethod
 
 class Szoba(ABC):
-    def __init__(self, ar, szobaszam):
-        self.ar = ar
+    def __init__(self, szobaszam):
         self.szobaszam = szobaszam
 
     @abstractmethod
-    def szolgaltatasok(self):
+    def ar_szamolas(self, napok):
         pass
 
 class EgyagyasSzoba(Szoba):
-    def __init__(self, ar, szobaszam, erkely=False):
-        super().__init__(ar, szobaszam)
-        self.erkely = erkely
-
-    def szolgaltatasok(self):
-        alap_szolgaltatasok = ["Ingyenes Wifi", "TV", "Fürdőszoba"]
-        if self.erkely:
-            alap_szolgaltatasok.append("Erkély")
-        return alap_szolgaltatasok
+    def ar_szamolas(self, napok):
+        return 10000 * napok
 
 class KetagyasSzoba(Szoba):
-    def __init__(self, ar, szobaszam, kilatas=False):
-        super().__init__(ar, szobaszam)
-        self.kilatas = kilatas
+    def ar_szamolas(self, napok):
+        return 15000 * napok
 
-    def szolgaltatasok(self):
-        alap_szolgaltatasok = ["Ingyenes Wifi", "TV", "Fürdőszoba"]
-        if self.kilatas:
-            alap_szolgaltatasok.append("Panorámás kilátás")
-        return alap_szolgaltatasok
+class Szalloda:
+    def __init__(self, nev):
+        self.nev = nev
+        self.szobak = []
 
-# Példák
+    def add_szoba(self, szoba):
+        self.szobak.append(szoba)
 
-egyagyas_szoba = EgyagyasSzoba(60, "101", erkely=True)
-print("Egyágyas szoba ára:", egyagyas_szoba.ar)
-print("Egyágyas szoba száma:", egyagyas_szoba.szobaszam)
-print("Egyágyas szoba szolgáltatások:", egyagyas_szoba.szolgaltatasok())
+    def listaz_szobak(self):
+        for szoba in self.szobak:
+            print(f"Szobaszám: {szoba.szobaszam}")
 
-ketagyas_szoba = KetagyasSzoba(100, "201", kilatas=True)
-print("Kétszemélyes szoba ára:", ketagyas_szoba.ar)
-print("Kétszemélyes szoba száma:", ketagyas_szoba.szobaszam)
-print("Kétszemélyes szoba szolgáltatások:", ketagyas_szoba.szolgaltatasok())
+class Foglalas:
+    def __init__(self, szoba, datum, napok):
+        self.szoba = szoba
+        self.datum = datum
+        self.napok = napok
+
+class FoglalasKezelo:
+    def __init__(self, szalloda):
+        self.szalloda = szalloda
+        self.foglalasok = []
+
+    def foglalas(self, szobaszam, datum, napok):
+        for szoba in self.szalloda.szobak:
+            if szoba.szobaszam == szobaszam:
+                foglalas_datum = datetime.combine(datum, datetime.min.time())
+                if foglalas_datum < datetime.now():
+                    print("Csak jövőbeni foglalás lehetséges.")
+                    return None
+                for foglalas in self.foglalasok:
+                    if foglalas.szoba == szoba and (foglalas.datum==datum or datum_interval(datum,datum+timedelta(days=napok),foglalas.datum,foglalas.datum+timedelta(days=foglalas.napok))):
+                        print("A megadott dátumra már foglalás van.")
+                        return None
+
+                foglalas = Foglalas(szoba, datum, napok)
+                self.foglalasok.append(foglalas)
+                return szoba.ar_szamolas(napok)
+        print("Nem létező szobaszám.")
+        return None
+
+    def lemondas(self, foglalas):
+        if foglalas in self.foglalasok:
+            self.foglalasok.remove(foglalas)
+            print("Foglalás sikeresen törölve.")
+        else:
+            print("Nincs ilyen foglalás.")
+
+    def listaz(self):
+        for foglalas in self.foglalasok:
+            print(f"Szoba: {foglalas.szoba.szobaszam}, Dátum: {foglalas.datum}, Napok: {foglalas.napok}")
+
+def create_example_system():
+    szalloda = Szalloda("Example Hotel")
+    szalloda.add_szoba(EgyagyasSzoba("101"))
+    szalloda.add_szoba(EgyagyasSzoba("102"))
+    szalloda.add_szoba(KetagyasSzoba("201"))
+    return szalloda
+def datum_interval(datum1_kezdet, datum1_veg, datum2_kezdet, datum2_veg):
+    return (datum1_kezdet <= datum2_veg and datum1_veg >= datum2_kezdet) or \
+           (datum2_kezdet <= datum1_veg and datum2_veg >= datum1_kezdet)
+def main():
+    szalloda = create_example_system()
+    foglalas_kezelo = FoglalasKezelo(szalloda)
+
+    # Példa foglalások hozzáadása
+    foglalas_kezelo.foglalas("101", datetime(2024, 4, 1), 3)
+    foglalas_kezelo.foglalas("102", datetime(2024, 4, 2), 2)
+    foglalas_kezelo.foglalas("201", datetime(2024, 4, 3), 5)
+    foglalas_kezelo.foglalas("101", datetime(2024, 4, 4), 1)
+    foglalas_kezelo.foglalas("102", datetime(2024, 4, 5), 4)
+
+    # Felhasználói interfész
+    while True:
+        print("\nVálassz egy műveletet:")
+        print("1. Szoba foglalás")
+        print("2. Foglalás lemondás")
+        print("3. Foglalások listázása")
+        print("4. Szobák listázása")
+        print("5. Kilépés")
+        valasztas = input("Művelet kiválasztása (1/2/3/4/5): ")
+
+        if valasztas == "1":
+            szobaszam = input("Add meg a foglalni kívánt szoba számát: ")
+            datum = datetime.strptime(input("Add meg a foglalás dátumát (YYYY-MM-DD): "), "%Y-%m-%d")
+            napok = int(input("Add meg a foglalás napjainak számát: "))
+            ar = foglalas_kezelo.foglalas(szobaszam, datum, napok)
+            if ar:
+                print(f"A foglalás sikeres. Ár: {ar}")
+            else:
+                print("Nem sikerült foglalni a szobát.")
+
+        elif valasztas == "2":
+            print("Kérem add meg a lemondani kívánt foglalás adatait:")
+            szobaszam = input("Szoba száma: ")
+            datum = datetime.strptime(input("Foglalás dátuma (YYYY-MM-DD): "), "%Y-%m-%d")
+            for foglalas in foglalas_kezelo.foglalasok:
+                if foglalas.szoba.szobaszam == szobaszam and foglalas.datum == datum:
+                    foglalas_kezelo.lemondas(foglalas)
+                    break
+
+        elif valasztas == "3":
+            print("Összes foglalás:")
+            foglalas_kezelo.listaz()
+        elif valasztas == "4":
+            print("Szobák:")
+            szalloda.listaz_szobak()
+
+        elif valasztas == "5":
+            print("Kilépés...")
+            break
+
+        else:
+            print("Érvénytelen választás. Kérem válasszon a felsorolt lehetőségek közül.")
+
+if __name__ == "__main__":
+    main()
