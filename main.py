@@ -49,7 +49,7 @@ class FoglalasKezelo:
                     return None
                 for foglalas in self.foglalasok:
                     if foglalas.szoba == szoba and (foglalas.datum==datum or datum_interval(datum,datum+timedelta(days=napok),foglalas.datum,foglalas.datum+timedelta(days=foglalas.napok))):
-                        print("A megadott dátumra már foglalás van.")
+                        print("A megadott dátumra ("+str(datum)+ ") már foglalt a " + szobaszam + " számú szoba.")
                         return None
 
                 foglalas = Foglalas(szoba, datum, napok)
@@ -70,7 +70,7 @@ class FoglalasKezelo:
             print(f"Szoba: {foglalas.szoba.szobaszam}, Dátum: {foglalas.datum}, Napok: {foglalas.napok}")
 
 def SzallodaLetrehozas():
-    szalloda = Szalloda("Example Hotel")
+    szalloda = Szalloda("Hotel GDF")
     szalloda.SzobaAdd(EgyagyasSzoba("101"))
     szalloda.SzobaAdd(EgyagyasSzoba("102"))
     szalloda.SzobaAdd(KetagyasSzoba("201"))
