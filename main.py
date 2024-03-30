@@ -22,10 +22,10 @@ class Szalloda:
         self.nev = nev
         self.szobak = []
 
-    def add_szoba(self, szoba):
+    def SzobaAdd(self, szoba):
         self.szobak.append(szoba)
 
-    def listaz_szobak(self):
+    def SzobaListaz(self):
         for szoba in self.szobak:
             print(f"Szobaszám: {szoba.szobaszam}")
 
@@ -40,7 +40,7 @@ class FoglalasKezelo:
         self.szalloda = szalloda
         self.foglalasok = []
 
-    def foglalas(self, szobaszam, datum, napok):
+    def Foglalas(self, szobaszam, datum, napok):
         for szoba in self.szalloda.szobak:
             if szoba.szobaszam == szobaszam:
                 foglalas_datum = datetime.combine(datum, datetime.min.time())
@@ -58,36 +58,36 @@ class FoglalasKezelo:
         print("Nem létező szobaszám.")
         return None
 
-    def lemondas(self, foglalas):
+    def FoglalasLemond(self, foglalas):
         if foglalas in self.foglalasok:
             self.foglalasok.remove(foglalas)
             print("Foglalás sikeresen törölve.")
         else:
             print("Nincs ilyen foglalás.")
 
-    def listaz(self):
+    def FoglalasListaz(self):
         for foglalas in self.foglalasok:
             print(f"Szoba: {foglalas.szoba.szobaszam}, Dátum: {foglalas.datum}, Napok: {foglalas.napok}")
 
-def create_example_system():
+def SzallodaLetrehozas():
     szalloda = Szalloda("Example Hotel")
-    szalloda.add_szoba(EgyagyasSzoba("101"))
-    szalloda.add_szoba(EgyagyasSzoba("102"))
-    szalloda.add_szoba(KetagyasSzoba("201"))
+    szalloda.SzobaAdd(EgyagyasSzoba("101"))
+    szalloda.SzobaAdd(EgyagyasSzoba("102"))
+    szalloda.SzobaAdd(KetagyasSzoba("201"))
     return szalloda
 def datum_interval(datum1_kezdet, datum1_veg, datum2_kezdet, datum2_veg):
     return (datum1_kezdet <= datum2_veg and datum1_veg >= datum2_kezdet) or \
            (datum2_kezdet <= datum1_veg and datum2_veg >= datum1_kezdet)
 def main():
-    szalloda = create_example_system()
+    szalloda = SzallodaLetrehozas()
     foglalas_kezelo = FoglalasKezelo(szalloda)
 
     # Példa foglalások hozzáadása
-    foglalas_kezelo.foglalas("101", datetime(2024, 4, 1), 3)
-    foglalas_kezelo.foglalas("102", datetime(2024, 4, 2), 2)
-    foglalas_kezelo.foglalas("201", datetime(2024, 4, 3), 5)
-    foglalas_kezelo.foglalas("101", datetime(2024, 4, 4), 1)
-    foglalas_kezelo.foglalas("102", datetime(2024, 4, 5), 4)
+    foglalas_kezelo.Foglalas("101", datetime(2024, 4, 1), 3)
+    foglalas_kezelo.Foglalas("102", datetime(2024, 4, 2), 2)
+    foglalas_kezelo.Foglalas("201", datetime(2024, 4, 3), 5)
+    foglalas_kezelo.Foglalas("101", datetime(2024, 4, 4), 1)
+    foglalas_kezelo.Foglalas("102", datetime(2024, 4, 5), 4)
 
     # Felhasználói interfész
     while True:
@@ -103,7 +103,7 @@ def main():
             szobaszam = input("Add meg a foglalni kívánt szoba számát: ")
             datum = datetime.strptime(input("Add meg a foglalás dátumát (YYYY-MM-DD): "), "%Y-%m-%d")
             napok = int(input("Add meg a foglalás napjainak számát: "))
-            ar = foglalas_kezelo.foglalas(szobaszam, datum, napok)
+            ar = foglalas_kezelo.Foglalas(szobaszam, datum, napok)
             if ar:
                 print(f"A foglalás sikeres. Ár: {ar}")
             else:
@@ -115,15 +115,15 @@ def main():
             datum = datetime.strptime(input("Foglalás dátuma (YYYY-MM-DD): "), "%Y-%m-%d")
             for foglalas in foglalas_kezelo.foglalasok:
                 if foglalas.szoba.szobaszam == szobaszam and foglalas.datum == datum:
-                    foglalas_kezelo.lemondas(foglalas)
+                    foglalas_kezelo.FoglalasLemond(foglalas)
                     break
 
         elif valasztas == "3":
             print("Összes foglalás:")
-            foglalas_kezelo.listaz()
+            foglalas_kezelo.FoglalasListaz()
         elif valasztas == "4":
             print("Szobák:")
-            szalloda.listaz_szobak()
+            szalloda.SzobaListaz()
 
         elif valasztas == "5":
             print("Kilépés...")
