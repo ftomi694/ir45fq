@@ -100,9 +100,9 @@ def main():
         valasztas = input("Művelet kiválasztása (1/2/3/4/5): ")
 
         if valasztas == "1":
-            szobaszam = input("Add meg a foglalni kívánt szoba számát: ")
-            datum = datetime.strptime(input("Add meg a foglalás dátumát (YYYY-MM-DD): "), "%Y-%m-%d")
-            napok = int(input("Add meg a foglalás napjainak számát: "))
+            szobaszam = input("Adja meg a foglalni kívánt szoba számát: ")
+            datum = datetime.strptime(input("Adja meg a foglalás dátumát (YYYY-MM-DD): "), "%Y-%m-%d")
+            napok = int(input("Adja meg a foglalás napjainak számát: "))
             ar = foglalas_kezelo.Foglalas(szobaszam, datum, napok)
             if ar:
                 print(f"A foglalás sikeres. Ár: {ar}")
