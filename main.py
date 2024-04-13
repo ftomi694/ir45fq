@@ -83,11 +83,11 @@ def main():
     foglalas_kezelo = FoglalasKezelo(szalloda)
 
     # Példa foglalások hozzáadása
-    foglalas_kezelo.Foglalas("101", datetime(2024, 4, 1), 3)
-    foglalas_kezelo.Foglalas("102", datetime(2024, 4, 2), 2)
-    foglalas_kezelo.Foglalas("201", datetime(2024, 4, 3), 5)
-    foglalas_kezelo.Foglalas("101", datetime(2024, 4, 4), 1)
-    foglalas_kezelo.Foglalas("102", datetime(2024, 4, 5), 4)
+    foglalas_kezelo.Foglalas("101", datetime(2024, 7, 1), 3)
+    foglalas_kezelo.Foglalas("102", datetime(2024, 6, 2), 2)
+    foglalas_kezelo.Foglalas("201", datetime(2024, 8, 3), 5)
+    foglalas_kezelo.Foglalas("101", datetime(2024, 8, 4), 1)
+    foglalas_kezelo.Foglalas("102", datetime(2024, 7, 5), 4)
 
     # Felhasználói interfész
     while True:
